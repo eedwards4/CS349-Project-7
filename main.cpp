@@ -4,13 +4,19 @@
 
 #include <iostream>
 #include <fstream>
+#include <vector>
 
 using namespace std;
 
 // Globals
 
+// Templates
+// template<vector<typename>> lineReader(int numLines, ); TODO: Learn how to template this
+
 // Function Prototypes
 void initFiles(ifstream& infile, ofstream& outfile, int argc, char* argv[]);
+vector<int> lineReaderInt(int numInputs, ifstream& in);
+bool checkForIntersect(int r, int x, int y, int n);
 int chadgptAlgo(int r, int x, int y, int n, ifstream& in);
 
 // Main
@@ -18,21 +24,30 @@ int main(int argc, char* argv[]) {
     // Variable defs
     ifstream infile; ofstream outfile;
     string line;
-    int rad, centerX, centerY, numLines;
+    int rad, centerX, centerY, numLines, numIntersects = 0;
+    pair<int, int> lineX, lineY;
+    vector<int> caseInputs, lineInputs;
     // Open files
     initFiles(infile, outfile, argc, argv);
     // File read
     while (!infile.eof()){
-        getline(infile, line);
-        rad = stoi(line.substr(0, line.find(' ')));
-        line.erase(0, line.find(' ') + 1);
-        centerX = stoi(line.substr(0, line.find(' ')));
-        line.erase(0, line.find(' ') + 1);
-        centerY = stoi(line.substr(0, line.find(' ')));
-        line.erase(0, line.find(' ') + 1);
-        numLines = stoi(line.substr(0, line.size()));
-        cout << chadgptAlgo(rad, centerX, centerY, numLines, infile) << "\n";
-        getline(infile, line); // Read the newline character
+        // Get each line of the initial input
+        caseInputs = lineReaderInt(4, infile); // Input order: r, x, y, n
+        for (int i : caseInputs){cout << i << " ";}
+        cout << "\n";
+
+        // Loop through each line to check against the given circle
+        for (int i = 0; i < caseInputs.at(3); i++) {
+            // Get the line coordinates
+            lineInputs = lineReaderInt(4, infile); // Input order: x1, y1, x2, y2
+            for (int j : lineInputs){cout << j << " ";}
+            cout << "\n";
+            // Check for intersection
+            // if (checkForIntersect(rad, centerX, centerY, numLines)) {numIntersects += 1;}
+            lineInputs.clear(); // Just in case
+        }
+        caseInputs.clear(); // Just in case
+        // cout << chadgptAlgo(rad, centerX, centerY, numLines, infile) << "\n";
     }
     // Cleanup before program end
     infile.close(); outfile.close();
@@ -65,6 +80,19 @@ int chadgptAlgo(int r, int x, int y, int n, ifstream& in){
         }
     }
     return cnt;
+}
+
+// Read a line of variable length/inputs and return a vector of ints
+vector<int> lineReaderInt(int numInputs, ifstream& in){
+    vector<int> inputs;
+    string line;
+    getline(in, line);
+    for (int i = 0; i < numInputs; i++){
+        if (line.size() == 1){inputs.push_back(stoi(line.substr(0, line.size()))); break;}
+        inputs.push_back(stoi(line.substr(0, line.find(' '))));
+        line.erase(0, line.find(' ') + 1);
+    }
+    return inputs;
 }
 
 /*
