@@ -33,14 +33,16 @@ int main(int argc, char* argv[]) {
     while (!infile.eof()){
         // Get each line of the initial input
         caseInputs = lineReaderInt(4, infile); // Input order: r, x, y, n
-        for (int i : caseInputs){cout << i << " ";}
+        for (int i : caseInputs)
+            cout << i << " ";
         cout << "\n";
 
         // Loop through each line to check against the given circle
         for (int i = 0; i < caseInputs.at(3); i++) {
             // Get the line coordinates
             lineInputs = lineReaderInt(4, infile); // Input order: x1, y1, x2, y2
-            for (int j : lineInputs){cout << j << " ";}
+            for (int j : lineInputs)
+                cout << j << " ";
             cout << "\n";
             // Check for intersection
             // if (checkForIntersect(rad, centerX, centerY, numLines)) {numIntersects += 1;}
@@ -56,7 +58,7 @@ int main(int argc, char* argv[]) {
 
 // ChatGPT's implementation of the problem :: TODO: REMOVE THIS AND WRITE OUR OWN ALGORITHM
 #include <cmath>
-int chadgptAlgo(int radius, int centerX, int centerY, int numLines, ifstream& in){
+int chadgptAlgo(int radius, int centerX, int centerY, int numLines, ifstream& in) {
     if(radius == 0 && centerX == 0 && centerY == 0 && numLines == 0) {
         return -1; // exit if input is all 0s
     }
@@ -65,11 +67,7 @@ int chadgptAlgo(int radius, int centerX, int centerY, int numLines, ifstream& in
         int x1, y1, x2, y2;
         in >> x1 >> y1 >> x2 >> y2;
         // check if line intersects with circle
-        double dx = x2 - x1;
-        double dy = y2 - y1;
-        double a = dx*dx + dy*dy;
-        double b = 2*dx*(x1 - centerX) + 2 * dy * (y1 - centerY);
-        double c = (centerX * centerX) + (centerY * centerY) + (x1 * x1) + (y1 * y1) - 2 * (centerX * x1 + centerY * y1) - (radius * radius);
+        double a, b, c;
         double determinant = b * b - 4 * a * c;
         if(determinant >= 0) { // the roots are not imaginary; from quadratic formula (completed below)
             double rootA = (-b - sqrt(determinant)) / (2 * a);
@@ -87,8 +85,8 @@ vector<int> lineReaderInt(int numInputs, ifstream& in){
     vector<int> inputs;
     string line;
     getline(in, line);
-    for (int i = 0; i < numInputs; i++){
-        if (line.size() == 1){inputs.push_back(stoi(line.substr(0, line.size()))); break;}
+    for (int i = 0; i < numInputs; i++) {
+        if (line.size() == 1) inputs.push_back(stoi(line.substr(0, line.size())));
         inputs.push_back(stoi(line.substr(0, line.find(' '))));
         line.erase(0, line.find(' ') + 1);
     }
