@@ -17,7 +17,7 @@ using namespace std;
 void initFiles(ifstream& infile, ofstream& outfile, int argc, char* argv[]);
 vector<int> lineReaderInt(int numInputs, ifstream& in);
 bool checkForIntersect(int r, int x, int y, int n);
-int chadgptAlgo(int r, int x, int y, int n, ifstream& in);
+int chadgptAlgo(int radius, int centerX, int centerY, int numLines, ifstream& in);
 
 // Main
 int main(int argc, char* argv[]) {
@@ -56,25 +56,25 @@ int main(int argc, char* argv[]) {
 
 // ChatGPT's implementation of the problem :: TODO: REMOVE THIS AND WRITE OUR OWN ALGORITHM
 #include <cmath>
-int chadgptAlgo(int r, int x, int y, int n, ifstream& in){
-    if(r == 0 && x == 0 && y == 0 && n == 0) {
+int chadgptAlgo(int radius, int centerX, int centerY, int numLines, ifstream& in){
+    if(radius == 0 && centerX == 0 && centerY == 0 && numLines == 0) {
         return -1; // exit if input is all 0s
     }
     int cnt = 1; // initialize counter to 1 (for the circle itself)
-    for(int i = 0; i < n; i++) {
+    for(int i = 0; i < numLines; i++) {
         int x1, y1, x2, y2;
         in >> x1 >> y1 >> x2 >> y2;
         // check if line intersects with circle
         double dx = x2 - x1;
         double dy = y2 - y1;
         double a = dx*dx + dy*dy;
-        double b = 2*dx*(x1-x) + 2*dy*(y1-y);
-        double c = x*x + y*y + x1*x1 + y1*y1 - 2*(x*x1 + y*y1) - r*r;
-        double det = b*b - 4*a*c;
-        if(det >= 0) { // line intersects with circle
-            double t1 = (-b - sqrt(det)) / (2*a);
-            double t2 = (-b + sqrt(det)) / (2*a);
-            if(t1 <= 1 && t1 >= 0 || t2 <= 1 && t2 >= 0) {
+        double b = 2*dx*(x1 - centerX) + 2 * dy * (y1 - centerY);
+        double c = (centerX * centerX) + (centerY * centerY) + (x1 * x1) + (y1 * y1) - 2 * (centerX * x1 + centerY * y1) - (radius * radius);
+        double determinant = b * b - 4 * a * c;
+        if(determinant >= 0) { // the roots are not imaginary; from quadratic formula (completed below)
+            double rootA = (-b - sqrt(determinant)) / (2 * a);
+            double rootB = (-b + sqrt(determinant)) / (2 * a);
+            if(rootA <= 1 && rootA >= 0 || rootB <= 1 && rootB >= 0) {
                 cnt++; // increment counter if line intersects with circle
             }
         }
