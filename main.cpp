@@ -43,12 +43,12 @@ int main(int argc, char* argv[]) {
         for (int i = 0; i < CI.at(3); i++) {
             // Get the line coordinates
             LI = lineReaderInt(4, infile); // Input order: x1, y1, x2, y2
-            lineStorage.push_back(LI); // Store line coordinates for intersection checking
             for (int j : LI)
                 cout << j << " ";
             cout << "\n";
             // Check for intersection (w/ circle)
             if (checkForIntersect(CI[0], CI[1], CI[2], LI[0], LI[1], LI[2], LI[3])){
+                lineStorage.push_back(LI); // Store line coordinates for intersection checking
                 numIntersectsTmp++;
             }
             // Check for intersection (w/ other lines)
@@ -71,53 +71,12 @@ int main(int argc, char* argv[]) {
     return 0;
 }
 
-// Vector manipulation functions
-pair<int, int> vAdd(pair<int, int> v1, pair<int, int> v2){ // Add
-    pair<int, int> returnPair;
-    returnPair.first = v1.first + v2.first;
-    returnPair.second = v1.second + v2.second;
-    return returnPair;
-}
-pair<int, int> vSub(pair<int, int> v1, pair<int, int> v2){ // Subtract
-    pair<int, int> returnPair;
-    returnPair.first = v1.first - v2.first;
-    returnPair.second = v1.second - v2.second;
-    return returnPair;
-}
-float dot(pair<int, int> v1, pair<int, int> v2){ // Dot product
-    return (v1.first * v2.first) + (v1.second * v2.second);
-}
-float hypot2(pair<int, int> v1, pair<int, int> v2){ // Hypotenuse
-    return dot(vSub(v1, v2), vSub(v1, v2));
-}
-pair<int, int> proj(pair<int, int> v1, pair<int, int> v2){ // Projection
-    float k = dot(v1, v2) / dot(v2, v2);
-    return make_pair(k * v2.first, k * v2.second);
-}
-
 // Check if lines intersect with circle
 bool checkForIntersect(int r, int centerX, int centerY, int x1, int y1, int x2, int y2){
-    // https://stackoverflow.com/a/1079478
-    // Use projection to determine dist between line point n and centerpoint
-    pair<int, int> AC = vSub(make_pair(x1, y1), make_pair(centerX, centerY));
-    pair<int, int> AB = vSub(make_pair(x2, y2), make_pair(x1, y1));
-    // Get point D on line AB closest to centerpoint
-    pair<int, int> D = vAdd(proj(AC, AB), make_pair(x1, y1));
-    // Reduce the chance of divide by zero errors
-    pair<int, int> AD = vSub(D, make_pair(x1, y1));
-    int dist = 0;
-    float k = abs(AD.first) > abs(AB.second) ? AD.first / AB.first : AD.second / AB.second;
-    // Check if D is within the line segment
-    if (k <= 0.0){
-        dist = sqrt(hypot2(make_pair(centerX, centerY), make_pair(x1, y1)));
-    } else if (k >= 1.0){
-        dist = sqrt(hypot2(make_pair(centerX, centerY), make_pair(x2, y2)));
-    } else{
-        dist = sqrt(hypot2(make_pair(centerX, centerY), D));
-    }
-    // Check if we're within the circle
-    if (r >= dist) return true;
-    // We aren't within the circle =(
+    float area2 = abs((x2 - x1) * (centerY - y1) - (centerX - x1) * (y2 - y1)); // Triangle area * 2
+    float dist = area2 / sqrt(pow(x2 - x1, 2) + pow(y2 - y1, 2)); // Distance as a function of area * 2 / segment length
+    if (dist <= r)
+        return true;
     return false;
 }
 
@@ -140,7 +99,6 @@ bool checkForLineIntersect(int firstX1, int firstY1, int firstX2, int firstY2, i
 }
 
 // ChatGPT's implementation of the problem :: TODO: REMOVE THIS AND WRITE OUR OWN ALGORITHM
-#include <cmath>
 int chadgptAlgo(int radius, int centerX, int centerY, int numLines, ifstream& in) {
     if(radius == 0 && centerX == 0 && centerY == 0 && numLines == 0) {
         return -1; // exit if input is all 0s
