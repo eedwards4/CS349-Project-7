@@ -20,13 +20,17 @@ vector<int> lineReaderInt(int numInputs, ifstream& in);
 bool checkForIntersect(int r, int centerX, int centerY, int x1, int y1, int x2, int y2);
 bool checkForLineIntersect(int firstX1, int firstY1, int firstX2, int firstY2, // First line
                            int secondX1, int secondY1, int secondX2, int secondY2, int rad, int cx, int cy); // Second line
+// Exec
+int findMaxCuts(int n){ // Lazy caterer's problem
+    return 1 + n*(n+1)/2;
+}
 
 // Main
 int main(int argc, char* argv[]) {
     // Variable defs
     ifstream infile; ofstream outfile;
     string line;
-    int numIntersects = 1, numIntersectsTmp = 0;
+    int numSections = 1, numIntersects = 0;
     vector<int> CI, LI; // case inputs; line inputs
     vector<vector<int>> lineStorage;
     // Open files
@@ -35,37 +39,32 @@ int main(int argc, char* argv[]) {
     while (!infile.eof()){
         // Get each line of the initial input
         CI = lineReaderInt(4, infile); // Input order: rad, center x, center y, number of lines
-        for (int i : CI)
-            cout << i << " ";
-        cout << "\n";
 
         // Loop through each line to check against the given circle
         for (int i = 0; i < CI.at(3); i++) {
             // Get the line coordinates
             LI = lineReaderInt(4, infile); // Input order: x1, y1, x2, y2
-            for (int j : LI)
-                cout << j << " ";
-            cout << "\n";
+
             // Check for intersection (w/ circle)
             if (checkForIntersect(CI[0], CI[1], CI[2], LI[0], LI[1], LI[2], LI[3])){
                 lineStorage.push_back(LI); // Store line coordinates for intersection checking
-                numIntersectsTmp++;
-            }
-            // Check for intersection (w/ other lines)
-            for (auto & j : lineStorage){
-                if (checkForLineIntersect(LI[0], LI[1], LI[2], LI[3], j[0], j[1], j[2], j[3], CI[0], CI[1], CI[2])){
-                    numIntersectsTmp *= 2;
+                numIntersects++;
+                // Check for intersection (w/ other lines)
+                for (auto & j : lineStorage){
+                    if (checkForLineIntersect(LI[0], LI[1], LI[2], LI[3], j[0], j[1], j[2], j[3], CI[0], CI[1], CI[2])){
+                        numIntersects++;
+                    }
                 }
             }
-            numIntersects += numIntersectsTmp;
-            numIntersectsTmp = 0;
+            numSections += numIntersects;
+            numIntersects = 0;
             LI.clear(); // Just in case
         }
         if (!(CI[0] == 0 && CI[1] == 0 && CI[2] == 0 && CI[3] == 0)){
-            outfile << numIntersects << "\n";
+            outfile << numSections << "\n";
         }
         CI.clear(); // Just in case
-        numIntersects = 1;
+        numSections = 1;
         lineStorage.clear();
     }
     // Cleanup before program end
@@ -103,6 +102,7 @@ bool checkForLineIntersect(int firstX1, int firstY1, int firstX2, int firstY2, i
         pair<int, int> intersect;
         intersect.first = ((firstX1 * firstY2 - firstY1 * firstX2) * (secondX1 - secondX2) - (firstX1 - firstX2) * (secondX1 * secondY2 - secondY1 * secondX2)) / ((firstX1 - firstX2) * (secondY1 - secondY2) - (firstY1 - firstY2) * (secondX1 - secondX2));
         intersect.second = ((firstX1 * firstY2 - firstY1 * firstX2) * (secondY1 - secondY2) - (firstY1 - firstY2) * (secondX1 * secondY2 - secondY1 * secondX2)) / ((firstX1 - firstX2) * (secondY1 - secondY2) - (firstY1 - firstY2) * (secondX1 - secondX2));
+        // Make sure this intersection is within the circle
         if (getDist(intersect.first, intersect.second, cx, cy) <= rad){
             return true;
         }
