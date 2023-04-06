@@ -19,14 +19,14 @@ void initFiles(ifstream& infile, ofstream& outfile, int argc, char* argv[]);
 vector<int> lineReaderInt(int numInputs, ifstream& in);
 bool checkForIntersect(int r, int centerX, int centerY, int x1, int y1, int x2, int y2);
 bool checkForLineIntersect(int firstX1, int firstY1, int firstX2, int firstY2, // First line
-                           int secondX1, int secondY1, int secondX2, int secondY2); // Second line
+                           int secondX1, int secondY1, int secondX2, int secondY2, int rad, int cx, int cy); // Second line
 
 // Main
 int main(int argc, char* argv[]) {
     // Variable defs
     ifstream infile; ofstream outfile;
     string line;
-    int numIntersects = 0, numIntersectsTmp = 0;
+    int numIntersects = 1, numIntersectsTmp = 0;
     vector<int> CI, LI; // case inputs; line inputs
     vector<vector<int>> lineStorage;
     // Open files
@@ -52,8 +52,8 @@ int main(int argc, char* argv[]) {
                 numIntersectsTmp++;
             }
             // Check for intersection (w/ other lines)
-            for (int j = 0; j < lineStorage.size(); j++){
-                if (checkForLineIntersect(LI[0], LI[1], LI[2], LI[3], lineStorage[j][0], lineStorage[j][1], lineStorage[j][2], lineStorage[j][3])){
+            for (auto & j : lineStorage){
+                if (checkForLineIntersect(LI[0], LI[1], LI[2], LI[3], j[0], j[1], j[2], j[3], CI[0], CI[1], CI[2])){
                     numIntersectsTmp *= 2;
                 }
             }
@@ -61,9 +61,11 @@ int main(int argc, char* argv[]) {
             numIntersectsTmp = 0;
             LI.clear(); // Just in case
         }
-        outfile << numIntersects << "\n";
+        if (!(CI[0] == 0 && CI[1] == 0 && CI[2] == 0 && CI[3] == 0)){
+            outfile << numIntersects << "\n";
+        }
         CI.clear(); // Just in case
-        numIntersects = 0;
+        numIntersects = 1;
         lineStorage.clear();
     }
     // Cleanup before program end
@@ -80,8 +82,13 @@ bool checkForIntersect(int r, int centerX, int centerY, int x1, int y1, int x2, 
     return false;
 }
 
+// Calculate the distance between two points
+float getDist(int x1, int y1, int x2, int y2){
+    return sqrt(pow(x2 - x1, 2) + pow(y2 - y1, 2));
+}
+
 // Check if lines intersect with each other
-bool checkForLineIntersect(int firstX1, int firstY1, int firstX2, int firstY2, int secondX1, int secondY1, int secondX2, int secondY2){
+bool checkForLineIntersect(int firstX1, int firstY1, int firstX2, int firstY2, int secondX1, int secondY1, int secondX2, int secondY2, int rad, int cx, int cy){
     // https://stackoverflow.com/questions/563198/how-do-you-detect-where-two-line-segments-intersect
     // check if lines are parallel
     if ((firstX1 - firstX2) * (secondY1 - secondY2) == (firstY1 - firstY2) * (secondX1 - secondX2)) {
@@ -93,7 +100,12 @@ bool checkForLineIntersect(int firstX1, int firstY1, int firstX2, int firstY2, i
     }
     // check if lines intersect
     if ((firstX1 - firstX2) * (secondY1 - firstY1) - (firstY1 - firstY2) * (secondX1 - firstX1) < 0) {
-        return true;
+        pair<int, int> intersect;
+        intersect.first = ((firstX1 * firstY2 - firstY1 * firstX2) * (secondX1 - secondX2) - (firstX1 - firstX2) * (secondX1 * secondY2 - secondY1 * secondX2)) / ((firstX1 - firstX2) * (secondY1 - secondY2) - (firstY1 - firstY2) * (secondX1 - secondX2));
+        intersect.second = ((firstX1 * firstY2 - firstY1 * firstX2) * (secondY1 - secondY2) - (firstY1 - firstY2) * (secondX1 * secondY2 - secondY1 * secondX2)) / ((firstX1 - firstX2) * (secondY1 - secondY2) - (firstY1 - firstY2) * (secondX1 - secondX2));
+        if (getDist(intersect.first, intersect.second, cx, cy) <= rad){
+            return true;
+        }
     }
     return false; // If none of the above conditions are met, the lines do not intersect
 }
