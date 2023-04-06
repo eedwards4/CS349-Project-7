@@ -110,29 +110,6 @@ bool checkForLineIntersect(int firstX1, int firstY1, int firstX2, int firstY2, i
     return false; // If none of the above conditions are met, the lines do not intersect
 }
 
-// ChatGPT's implementation of the problem :: TODO: REMOVE THIS AND WRITE OUR OWN ALGORITHM
-int chadgptAlgo(int radius, int centerX, int centerY, int numLines, ifstream& in) {
-    if(radius == 0 && centerX == 0 && centerY == 0 && numLines == 0) {
-        return -1; // exit if input is all 0s
-    }
-    int cnt = 1; // initialize counter to 1 (for the circle itself)
-    for(int i = 0; i < numLines; i++) {
-        int x1, y1, x2, y2;
-        in >> x1 >> y1 >> x2 >> y2;
-        // check if line intersects with circle
-        double a, b, c;
-        double determinant = b * b - 4 * a * c;
-        if(determinant >= 0) { // the roots are not imaginary; from quadratic formula (completed below)
-            double rootA = (-b - sqrt(determinant)) / (2 * a);
-            double rootB = (-b + sqrt(determinant)) / (2 * a);
-            if(rootA <= 1 && rootA >= 0 || rootB <= 1 && rootB >= 0) {
-                cnt++; // increment counter if line intersects with circle
-            }
-        }
-    }
-    return cnt;
-}
-
 // Read a line of variable length/inputs and return a vector of ints
 vector<int> lineReaderInt(int numInputs, ifstream& in){
     vector<int> inputs;
