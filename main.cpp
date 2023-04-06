@@ -77,7 +77,7 @@ int main(int argc, char* argv[]) {
 bool checkForIntersect(int r, int centerX, int centerY, int x1, int y1, int x2, int y2){
     float area2 = abs((x2 - x1) * (centerY - y1) - (centerX - x1) * (y2 - y1)); // Triangle area * 2
     float dist = area2 / sqrt(pow(x2 - x1, 2) + pow(y2 - y1, 2)); // Distance as a function of area * 2 / segment length
-    if (dist <= r)
+    if (dist <= r) // Check if distance is smaller than radius
         return true;
     return false;
 }
