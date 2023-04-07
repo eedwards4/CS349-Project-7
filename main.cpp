@@ -14,7 +14,7 @@ using namespace std;
 // Templates
 // UNUSED IN THIS PROJECT
 template <typename T>
-vector<T> lineReader(int numInputs, ifstream& in){
+vector<T> lineReader(int numInputs, ifstream& in){ // Template function to process n lines of input
     vector<T> inputs;
     string line;
     getline(in, line);
