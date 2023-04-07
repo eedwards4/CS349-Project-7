@@ -9,11 +9,6 @@
 
 using namespace std;
 
-// Globals
-
-// Templates
-// template<vector<typename>> lineReader(int numLines, ); TODO: Learn how to template this
-
 // Function Prototypes
 void initFiles(ifstream& infile, ofstream& outfile, int argc, char* argv[]);
 vector<int> lineReaderInt(int numInputs, ifstream& in);
@@ -35,7 +30,7 @@ int main(int argc, char* argv[]) {
     // Open files
     initFiles(infile, outfile, argc, argv);
     // File read
-    while (!infile.eof()){
+    while (!infile.eof()) {
         // Get each line of the initial input
         caseInputs = lineReaderInt(4, infile); // Input order: rad, center x, center y, number of lines
         int rad = caseInputs[0], cx = caseInputs[1], cy = caseInputs[2], numCases = caseInputs.at(3);
@@ -58,11 +53,11 @@ int main(int argc, char* argv[]) {
             }
 
             // Check for intersection (w/ other lines)
-            for (auto & j : lineStorage){
+            for (auto & j : lineStorage) {
                 pair<double, double> tempPoint = calcIntersectionPoint(
                         x1, y1, x2, y2, j[0], j[1], j[2], j[3]);
                 if (verifyLineIntersect(x1, y1, x2, y2, j[0], j[1], j[2], j[3])
-                    && getDist(tempPoint.first, tempPoint.second, cx, cy) <= rad) {
+                    && getDist(tempPoint.first, tempPoint.second, cx, cy) <= rad) { // These lines intersect within the circle
                     numAreasTmp++;
                 }
             }
@@ -128,7 +123,7 @@ pair<double, double> calcIntersectionPoint(int firstX1, int firstY1, int firstX2
 }
 
 // Read a line of variable length/inputs and return a vector of ints
-vector<int> lineReaderInt(int numInputs, ifstream& in){
+vector<int> lineReaderInt(int numInputs, ifstream& in) {
     vector<int> inputs;
     string line;
     getline(in, line);
@@ -150,7 +145,7 @@ vector<int> lineReaderInt(int numInputs, ifstream& in){
  *
  *  If the user has no input file available to pass, then they must enter ## when prompted to exit the program.
  */
-void initFiles(ifstream& infile, ofstream& outfile, int argc, char* argv[]){
+void initFiles(ifstream& infile, ofstream& outfile, int argc, char* argv[]) {
     char confirm = 'n';
     string fname;
     // Check for inputs
