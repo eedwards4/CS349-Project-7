@@ -12,18 +12,35 @@ using namespace std;
 // Globals
 
 // Templates
-// template<vector<typename>> lineReader(int numLines, ); TODO: Learn how to template this
+// UNUSED IN THIS PROJECT
+template <typename T>
+vector<T> lineReader(int numInputs, ifstream& in){
+    vector<T> inputs;
+    string line;
+    getline(in, line);
+    for (int i = 0; i < numInputs; i++) {
+        if constexpr (std::is_same_v<T, int> || std::is_same_v<T, double> || std::is_same_v<T, float>){
+            // Covers BASIC int stuff (subs in std::stoi)
+            if (line.size() == 1) inputs.push_back(stoi(line.substr(0, line.size())));
+            inputs.push_back(stoi(line.substr(0, line.find(' '))));
+            line.erase(0, line.find(' ') + 1);
+        } else{
+            // Assumes that if a datatype isn't int it is a string/char
+            if (line.size() == 1) inputs.push_back(line.substr(0, line.size()));
+            inputs.push_back(line.substr(0, line.find(' ')));
+            line.erase(0, line.find(' ') + 1);
+        }
+    }
+    return inputs;
+}
+// UNUSED IN THIS PROJECT
 
 // Function Prototypes
 void initFiles(ifstream& infile, ofstream& outfile, int argc, char* argv[]);
 vector<int> lineReaderInt(int numInputs, ifstream& in);
-bool checkForIntersect(int r, int centerX, int centerY, int x1, int y1, int x2, int y2);
+bool checkForCircleIntersect(int r, int centerX, int centerY, int x1, int y1, int x2, int y2);
 bool checkForLineIntersect(int firstX1, int firstY1, int firstX2, int firstY2, // First line
                            int secondX1, int secondY1, int secondX2, int secondY2, int rad, int cx, int cy); // Second line
-// Exec
-int findMaxCuts(int n){ // Lazy caterer's problem
-    return 1 + n*(n+1)/2;
-}
 
 // Main
 int main(int argc, char* argv[]) {
@@ -46,7 +63,7 @@ int main(int argc, char* argv[]) {
             LI = lineReaderInt(4, infile); // Input order: x1, y1, x2, y2
 
             // Check for intersection (w/ circle)
-            if (checkForIntersect(CI[0], CI[1], CI[2], LI[0], LI[1], LI[2], LI[3])){
+            if (checkForCircleIntersect(CI[0], CI[1], CI[2], LI[0], LI[1], LI[2], LI[3])){
                 lineStorage.push_back(LI); // Store line coordinates for intersection checking
                 numIntersects++;
                 // Check for intersection (w/ other lines)
@@ -73,7 +90,7 @@ int main(int argc, char* argv[]) {
 }
 
 // Check if lines intersect with circle
-bool checkForIntersect(int r, int centerX, int centerY, int x1, int y1, int x2, int y2){
+bool checkForCircleIntersect(int r, int centerX, int centerY, int x1, int y1, int x2, int y2){
     float area2 = abs((x2 - x1) * (centerY - y1) - (centerX - x1) * (y2 - y1)); // Triangle area * 2
     float dist = area2 / sqrt(pow(x2 - x1, 2) + pow(y2 - y1, 2)); // Distance as a function of area * 2 / segment length
     if (dist <= r) // Check if distance is smaller than radius
@@ -81,7 +98,7 @@ bool checkForIntersect(int r, int centerX, int centerY, int x1, int y1, int x2, 
     return false;
 }
 
-// Calculate the distance between two points
+// Calculate the distance between two points (Local function)
 float getDist(int x1, int y1, int x2, int y2){
     return sqrt(pow(x2 - x1, 2) + pow(y2 - y1, 2));
 }
@@ -99,9 +116,11 @@ bool checkForLineIntersect(int firstX1, int firstY1, int firstX2, int firstY2, i
     }
     // check if lines intersect
     if ((firstX1 - firstX2) * (secondY1 - firstY1) - (firstY1 - firstY2) * (secondX1 - firstX1) < 0) {
-        pair<int, int> intersect;
-        intersect.first = ((firstX1 * firstY2 - firstY1 * firstX2) * (secondX1 - secondX2) - (firstX1 - firstX2) * (secondX1 * secondY2 - secondY1 * secondX2)) / ((firstX1 - firstX2) * (secondY1 - secondY2) - (firstY1 - firstY2) * (secondX1 - secondX2));
-        intersect.second = ((firstX1 * firstY2 - firstY1 * firstX2) * (secondY1 - secondY2) - (firstY1 - firstY2) * (secondX1 * secondY2 - secondY1 * secondX2)) / ((firstX1 - firstX2) * (secondY1 - secondY2) - (firstY1 - firstY2) * (secondX1 - secondX2));
+        pair<int, int> intersect; // Get the intersection point
+        intersect.first = ((firstX1 * firstY2 - firstY1 * firstX2) * (secondX1 - secondX2) - (firstX1 - firstX2) * (secondX1 * secondY2 - secondY1 * secondX2)) /
+                ((firstX1 - firstX2) * (secondY1 - secondY2) - (firstY1 - firstY2) * (secondX1 - secondX2));
+        intersect.second = ((firstX1 * firstY2 - firstY1 * firstX2) * (secondY1 - secondY2) - (firstY1 - firstY2) * (secondX1 * secondY2 - secondY1 * secondX2)) /
+                ((firstX1 - firstX2) * (secondY1 - secondY2) - (firstY1 - firstY2) * (secondX1 - secondX2));
         // Make sure this intersection is within the circle
         if (getDist(intersect.first, intersect.second, cx, cy) <= rad){
             return true;
